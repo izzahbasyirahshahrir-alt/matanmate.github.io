@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Matan Qiraat – Surah Al-Baqarah</title>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root { --hijau:#0f5132; --muda:#e8f3ec; --garis:#d5ddd8; }
+  * { box-sizing: border-box; }
+  body { font-family: system-ui, sans-serif; margin:0; background:#f7f9f8; color:#222; }
+  header { background:var(--hijau); color:#fff; padding:16px 20px; }
+  header h1 { margin:0; font-size:1.3rem; }
+  header p { margin:4px 0 0; font-size:.85rem; opacity:.85; }
+  main { max-width:900px; margin:0 auto; padding:16px; }
+  .tabs { display:flex; gap:8px; margin-bottom:12px; }
+  .tabs button { flex:1; padding:10px; border:1px solid var(--garis); background:#fff; cursor:pointer; border-radius:8px; font-size:.95rem; }
+  .tabs button.aktif { background:var(--hijau); color:#fff; }
+  .kawalan { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:12px; }
+  .kawalan input, .kawalan select { padding:9px; border:1px solid var(--garis); border-radius:8px; font-size:.95rem; flex:1; min-width:160px; }
+  .kad { background:#fff; border:1px solid var(--garis); border-radius:10px; padding:14px; margin-bottom:12px; }
+  .ayat { color:var(--hijau); font-weight:600; font-size:.85rem; }
+  .arab { font-family:"Amiri","Scheherazade New","Traditional Arabic","Noto Naskh Arabic",serif; direction:rtl; font-size:1.7rem; line-height:2; }
+  .kalimah { font-size:2rem; display:inline-block; }
+  .bacaan { border-top:1px dashed var(--garis); padding-top:8px; margin-top:8px; }
+  .imam { display:inline-block; background:var(--muda); color:var(--hijau); padding:2px 8px; border-radius:20px; font-size:.8rem; margin:2px 3px 2px 0; }
+  .cara { font-size:.9rem; margin:4px 0; }
+  .matan { background:#fafafa; border-left:3px solid var(--hijau); padding:8px 10px; margin-top:8px; font-size:.9rem; }
+  .matan .arab { font-size:1.3rem; line-height:1.9; }
+  .kosong { color:#a33; font-style:italic; }
+  .btn { padding:9px 16px; background:var(--hijau); color:#fff; border:0; border-radius:8px; cursor:pointer; margin-top:10px; margin-right:6px; }
+  .tersembunyi { display:none; }
+  .legenda { font-size:.85rem; color:#555; margin:0 0 10px; }
+  .legenda .contoh { color:#b45309; border-bottom:2px solid #f59e0b; padding:0 3px; }
+  .ayatQ { background:#fff; border:1px solid var(--garis); border-radius:10px; padding:8px 16px; margin-bottom:10px; }
+  .teksAyat { font-size:2rem; line-height:2.5; }
+  .khilaf { font:inherit; line-height:inherit; color:#b45309; background:none; border:0; border-bottom:2px solid #f59e0b; border-radius:4px; padding:0 3px; cursor:pointer; }
+  .khilaf:hover { background:#fef3c7; }
+  .khilaf.pilih { background:#fde68a; color:#7c2d12; }
+  .penanda { color:var(--hijau); font-size:1.5rem; }
+  .petunjuk { color:#555; font-size:.9rem; }
+  #butiranAyat { margin-top:14px; }
+  @media (max-width:480px) { .tabs button { font-size:.8rem; padding:8px 4px; } .teksAyat { font-size:1.6rem; } }
+  .nota { direction:ltr; text-align:left; font-size:.9rem; color:#555; font-style:italic; }
+  .bilangan { font-size:.85rem; color:#555; margin:0 0 10px; }
+  button:focus-visible, input:focus-visible, select:focus-visible { outline:2px solid var(--hijau); outline-offset:2px; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Matan Qiraat: Surah Al-Baqarah ayat 1-5</h1>
+  <p>Khilaf imam/perawi, kalimah, cara bacaan, matan Syatibiyyah &amp; Durrah</p>
+</header>
+
+<main>
+  <div class="tabs">
+    <button type="button" id="tabAyat" class="aktif" aria-pressed="true">📜 Ayat Al-Quran</button>
+    <button type="button" id="tabSenarai" aria-pressed="false">📖 Senarai Ayat Khilaf</button>
+    <button type="button" id="tabKad" aria-pressed="false">🧠 Semak (Kad Imbas)</button>
+  </div>
+
+  <!-- TAB AYAT AL-QURAN -->
+  <section id="paparAyat">
+    <p class="legenda">Klik kalimah <span class="contoh">berwarna</span> untuk melihat khilaf dan matan.</p>
+    <div id="ayatQuran"></div>
+    <div id="butiranAyat"></div>
+  </section>
+
+  <!-- TAB SENARAI -->
+  <section id="paparSenarai" class="tersembunyi">
+    <div class="kawalan">
+      <input id="cari" type="search" placeholder="Cari kalimah / nombor ayat (cth: 2:4)">
+      <select id="tapisImam"><option value="">Semua imam</option></select>
+      <select id="tapisMatan">
+        <option value="semua">Matan: kedua-dua</option>
+        <option value="syatibiyyah">Syatibiyyah sahaja</option>
+        <option value="durrah">Durrah sahaja</option>
+      </select>
+    </div>
+    <p id="bilangan" class="bilangan" aria-live="polite"></p>
+    <div id="senarai"></div>
+  </section>
+
+  <!-- TAB KAD IMBAS -->
+  <section id="paparKad" class="tersembunyi">
+    <div class="kad" id="kadImbas"></div>
+    <button type="button" class="btn" id="btnTunjuk">Tunjuk jawapan</button>
+    <button type="button" class="btn" id="btnSeterusnya">Seterusnya ➜</button>
+  </section>
+</main>
+
+<script>
+/* ============ DATA ============ */
+
+// Imam dalam Syatibiyyah (7) dan Durrah (+3)
+const IMAM_SYATIBIYYAH = ["Nafi'","Ibn Kathir","Abu 'Amr","Ibn 'Amir","'Asim","Hamzah","Al-Kisa'i"];
+const IMAM_DURRAH      = ["Abu Ja'far","Ya'qub","Khalaf al-'Ashir"];
+const SEMUA_IMAM = [...IMAM_SYATIBIYYAH, ...IMAM_DURRAH];
+
+// Nota: nama perawi (Warsy, Qalun, Susi) turut disenaraikan dalam penapis.
+const PERAWI = ["Qalun","Warsy","Susi"];
+
+const DATA = [
+  {
+    id: 1,
+    ayat: "1",
+    kalimah: "الٓمٓ ",
+    konteks: "الٓمٓ ",
+    bacaan: [
+      { teks: "الٓمٓ ", imam: ["Abu Ja'far"], cara: "saktah" }
+    ],
+    matan: {
+      durrah: `حُرُوْف التَّهَجِّي افْصِلْ بِسَكْتٍ كَحَا أَلِفْ ... أَلاَ`
+    }
+  },
+  {
+    id: 2,
+    ayat: "2",
+    kalimah: "فِيهِ",
+    konteks: "ذَٰلِكَ ٱلْكِتَـٰبُ لَا رَيْبَ ۛ فِيهِ ۛ هُدًى لِّلْمُتَّقِينَ",
+    bacaan: [
+      { teks: "فِيهِ", imam: ["Ibn Kathir"], cara: "silah ha kinayah (فِيهِى)" }
+    ],
+    matan: {
+      syatibiyyah: `ولم يصلوا ها مضمر قبل ساكن
+وما قبله التحريك للكل وصلا
+وما قبله التسكين لابن كثيرهم`
+    }
+  },
+  {
+    id: 3,
+    ayat: "2",
+    kalimah: "فِيهِ هُدًى",
+    konteks: "ۛ فِيهِ ۛ هُدًى لِّلْمُتَّقِينَ",
+    bacaan: [
+      { teks: "فِيهِ ۛ هُدًى", imam: ["Susi"], cara: "idgham kabir" }
+    ],
+    matan: {
+      syatibiyyah: `ودونك الادغام الكبير وقطبه
+أبو عمرو البصري فيه تحفلا`
+    }
+  },
+  {
+    id: 4,
+    ayat: "3",
+    kalimah: "يُؤْمِنُونَ",
+    konteks: "ٱلَّذِينَ يُؤْمِنُونَ بِٱلْغَيْبِ",
+    bacaan: [
+      { teks: "يُومِنُونَ", imam: ["Warsy","Susi","Abu Ja'far"], cara: "Ibdal (يُومِنُونَ)" }
+    ],
+    matan: {
+      syatibiyyah: `إذا سكنت فاء من الفعل همزة
+فورش يريها حرف مد مبدلا
+ويبدل للسوسي كل مسكن
+من الهمز مدا غير مجزوم أهملا`,
+      durrah: `وَسَاكِنَهُ حَقِّقْ حِمَاهُ وَأَبْدِلَنْ ... إِذَنْ`
+    }
+  },
+  {
+    id: 5,
+    ayat: "3",
+    kalimah: "ٱلصَّلَوٰةَ",
+    konteks: "وَيُقِيمُونَ ٱلصَّلَوٰةَ وَمِمَّا رَزَقْنَـٰهُمْ يُنفِقُونَ",
+    bacaan: [
+      { teks: "ٱلصَّلَوٰةَ", imam: ["Warsy"], cara: "tafkhim lam" }
+    ],
+    matan: {
+      syatibiyyah: `وغلظ ورش فتح لام لصادها
+أو الطاء أو للظاء قبل تنزلا
+إذا فتحت أو سكنت`
+    }
+  },
+  {
+    id: 6,
+    ayat: "3",
+    kalimah: "رَزَقْنَـٰهُمْ",
+    konteks: "وَمِمَّا رَزَقْنَـٰهُمْ يُنفِقُونَ",
+    bacaan: [
+      { teks: "رَزَقْنَـٰهُمُو", imam: ["Qalun","Ibn Kathir","Abu Ja'far"], cara: "silah mim jamak (رَزَقْنَـٰهُمُو)" }
+    ],
+    matan: {
+      syatibiyyah: `وصل ضم ميم الجمع قبل محرك
+دراكا وقالون بتخييره جلا`,
+      durrah: `وَصِلْ ضَمَّ مِيْمِ الْجَمْعِ أَصْلٌ`,
+    }
+  },
+  {
+    id: 7,
+    ayat: "4",
+    kalimah: "يُؤْمِنُونَ",
+    konteks: "يُومِنُونَ",
+    bacaan: [
+      { teks: "وَيُومِنُونَ", imam: ["Warsy","Susi","Abu Ja'far"], cara: "Ibdal (يُومِنُونَ)" }
+    ],
+    matan: {
+      syatibiyyah: `إذا سكنت فاء من الفعل همزة
+فورش يريها حرف مد مبدلا
+ويبدل للسوسي كل مسكن
+من الهمز مدا غير مجزوم أهملا`,
+      durrah: `وَسَاكِنَهُ حَقِّقْ حِمَاهُ وَأَبْدِلَنْ ... إِذَنْ`
+    }
+  },
+  {
+    id: 8,
+    ayat: "4",
+    kalimah: "بِمَا أُنزِلَ",
+    konteks: "وَيُؤْمِنُونَ بِمَا أُنزِلَ إِلَيْكَ",
+    bacaan: [
+      { teks: "بِمَا أُنزِلَ", imam: ["Qalun","Ibn Kathir","Abu 'Amr","Abu Ja'far","Ya'qub"], cara: "qasr" },
+      { teks: "بِمَا أُنزِلَ", imam: ["Warsy","Hamzah"], cara: "isyba'" }
+    ],
+    matan: {
+      syatibiyyah: `إذا ألف أو ياؤها بعد كسرة
+أو الواو عن ضم لقي الهمز طولا
+فإن ينفصل فالقصر بادره طالبا
+بخلفهما يرويك درا ومخضلا
+وما بعد همز ثابت أو مغير
+فقصر وقد يروى لورش مطولا
+ووسطه قوم`,
+      durrah: `وَمَدَّهُمُ وَسِّطْ وَمَا انْفَصَلَ اقْصُرَنْ ... أَلاَ حُزْ`
+    }
+  },
+  {
+    id: 9,
+    ayat: "4",
+    kalimah: "وَمَا أُنزِلَ",
+    konteks: "وَمَا أُنزِلَ مِن قَبْلِكَ",
+    bacaan: [
+      { teks: "وَمَا أُنزِلَ", imam: ["Qalun","Ibn Kathir","Abu 'Amr","Abu Ja'far","Ya'qub"], cara: "qasr" },
+      { teks: "وَمَا أُنزِلَ", imam: ["Warsy","Hamzah"], cara: "isyba'" }
+    ],
+    matan: {
+      syatibiyyah: `إذا ألف أو ياؤها بعد كسرة
+أو الواو عن ضم لقي الهمز طولا
+فإن ينفصل فالقصر بادره طالبا
+بخلفهما يرويك درا ومخضلا
+وما بعد همز ثابت أو مغير
+فقصر وقد يروى لورش مطولا
+ووسطه قوم`,
+      durrah: `وَمَدَّهُمُ وَسِّطْ وَمَا انْفَصَلَ اقْصُرَنْ ... أَلاَ حُزْ`
+    }
+  },
+  {
+    id: 10,
+    ayat: "4",
+    kalimah:"وَبِٱلْـَٔاخِرَةِ ",
+    konteks: "وَبِٱلْـَٔاخِرَةِ هُمْ يُوقِنُونَ",
+    bacaan:[
+      { teks: "وَبِٱلَـاخِرَةِ ", imam: ["Warsy"], cara: "naqal"},
+      { teks: "وَبِٱلْـَٔاخِرَةِ ", imam: ["Hamzah"], cara: "saktah ketika wasal; naqal dan saktah ketika waqaf" }
+    ],
+    matan: {
+      syatibiyyah: `وَحَرِّكْ لِوَرْشٍ كُلَّ سَاكِنٍ آخِرٍ ... صَحِيحٍ بِشَكْلِ الْهَمْزِ واحْذِفْهُ مُسْهِلَا
+وَعَنْ حَمْزَةٍ في الْوَقْفِ خُلْفٌ وَعِنْدَهُ ... رَوَى خَلَفٌ في الْوَصْلِ سَكْتًا مُقَلَّلَا
+وَيَسْكُتُ في شَيْءٍ وَشَيْئًا وَبَعْضُهُمْ ... لَدَى الَّلامِ لِلتَّعْرِيفِ عَنْ حَمْزَةٍ تَلَا`,
+     durrah: `Tiada perbezaan antara imam, perawi dan cara bacaan bagi kalimah ini. Semua imam membaca dengan cara yang sama.`
+    }
+  },
+  {
+    id: 11,
+    ayat: "4",
+    kalimah:"وَبِٱلْـَٔاخِرَةِ ",
+    konteks: "وَبِٱلْـَٔاخِرَةِ هُمْ يُوقِنُونَ",
+    bacaan:[
+      { teks: "وَبِٱلْـَٔاخِرَةِ", imam: ["Warsy"], cara: "tarqiq huruf ra"}, 
+    ],
+    matan: {
+      syatibiyyah: `وَرَقَّقَ وَرْشٌ كُلَّ رَاءٍ وَقَبْلَهَا ... مُسَكَّنَةً يَاءٌ أَوِ الْكَسْرُ مُوصَلَا`
+    }
+  },
+  {
+    id: 12,
+    ayat: "4",
+    kalimah: "هُمْ",
+    konteks: "وَبِٱلْـَٔاخِرَةِ هُمْ يُوقِنُونَ",
+    bacaan: [
+      { teks: "هُمْ", imam: ["Qalun","Abu 'Amr", "Ibn 'Amir", "'Asim", "Hamzah","Al-Kisa'i", "Ya'qub","Khalaf al-'Ashir"], cara: "sukun" },
+      { teks: "هُمُو", imam: ["Qalun","Ibn Kathir", "Abu Ja'far"], cara: "silah mim jamak"  }
+    ],
+    matan: {
+      syatibiyyah: `وصل ضم ميم الجمع قبل محرك
+دراكا وقالون بتخييره جلا`,
+      durrah: `وَصِلْ ضَمَّ مِيْمِ الْجَمْعِ أَصْلٌ`
+    }
+  },
+  {
+    id:13,
+    ayat: "5",
+    kalimah: "أُو۟لَـٰٓئِكَ",
+    konteks: "أُو۟لَـٰٓئِكَ عَلَىٰ هُدًۭى مِّن رَّبِّهِمْ ۖ",
+    bacaan: [
+      { teks: "أُو۟لَـٰٓئِكَ", imam: ["Qalun","Ibn Kathir","Abu 'Amr","Abu Ja'far","Ya'qub"], cara: "qasr" },
+      { teks: "أُو۟لَـٰٓئِكَ", imam: ["Warsy","Hamzah"], cara: "isyba'" }
+    ],
+    matan: {
+      syatibiyyah: `إذا ألف أو ياؤها بعد كسرة
+    أو الواو عن ضم لقي الهمز طولا`,
+      durrah: `وَمَدَّهُمُ وَسِّطْ وَمَا انْفَصَلَ اقْصُرَنْ ... أَلاَ حُزْ`
+    }
+  },
+  {
+    id:14,
+    ayat: "5",
+    kalimah: " رَّبِّهِمْ",
+    konteks: "أُو۟لَـٰٓئِكَ عَلَىٰ هُدًۭى مِّن رَّبِّهِمْ ",
+    bacaan: [
+      { teks: "مِّن رَّبِّهِمْ", imam: ["Qalun","Abu 'Amr", "Ibn 'Amir", "'Asim", "Hamzah","Al-Kisa'i", "Ya'qub","Khalaf al-'Ashir"], cara: "sukun" },
+      { teks: "مِّن رَّبِّهِمْ", imam: ["Qalun", "Ibn Kathir","Ya'qub"], cara: "silah mim jamak" }
+    ],
+    matan: {
+      syatibiyyah: `وصل ضم ميم الجمع قبل محرك
+دراكا وقالون بتخييره جلا`,
+      durrah: `وَصِلْ ضَمَّ مِيْمِ الْجَمْعِ أَصْلٌ`  
+    }
+  },
+  {
+    id:15,
+    ayat: "5",
+    kalimah:"هُدًۭى",
+    konteks:" وَأُو۟لَـٰٓئِكَ هُمُ ٱلْمُفْلِحُونَ",
+    bacaan:[
+      { teks: "وَأُو۟لَـٰٓئِكَ", imam: ["Qalun","Ibn Kathir","Abu 'Amr","Abu Ja'far","Ya'qub"], cara: "qasr" },
+      { teks: "وَأُو۟لَـٰٓئِكَ", imam: ["Warsy","Hamzah"], cara: "isyba'" }
+    ],
+    matan: {
+      syatibiyyah: `إذا ألف أو ياؤها بعد كسرة
+    أو الواو عن ضم لقي الهمز طولا`,
+      durrah: `وَمَدَّهُمُ وَسِّطْ وَمَا انْفَصَلَ اقْصُرَنْ ... أَلاَ حُزْ`
+    }
+  },
+  {
+    id:16,
+    ayat: "5",
+    kalimah:"وَأُو۟لَـٰٓئِكَ",
+    konteks:" وَأُو۟لَـٰٓئِكَ هُمُ ٱلْمُفْلِحُونَ",
+    bacaan:[
+      { teks: "وَأُو۟لَـٰٓئِكَ", imam: ["Qalun","Ibn Kathir","Abu 'Amr","Abu Ja'far","Ya'qub"], cara: "qasr" },
+      { teks: "وَأُو۟لَـٰٓئِكَ", imam: ["Warsy","Hamzah"], cara: "isyba'" }
+    ],
+    matan: {
+      syatibiyyah: `إذا ألف أو ياؤها بعد كسرة
+    أو الواو عن ضم لقي الهمز طولا`,
+      durrah: `وَمَدَّهُمُ وَسِّطْ وَمَا انْفَصَلَ اقْصُرَنْ ... أَلاَ حُزْ`
+    }
+  }
+];
+
+/* ============ UTILITI ============ */
+const esc = s => String(s).replace(/[&<>"']/g, c =>
+  ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+const $ = id => document.getElementById(id);
+
+// Buang harakat/tanda Quran, seragamkan huruf alif/ya, huruf kecil, buang apostrof
+const TANDA_ARAB = /[\u0610-\u061A\u064B-\u065F\u0670\u06D6-\u06ED\u0640]/g;
+const norm = s => String(s)
+  .normalize("NFKD")
+  .replace(TANDA_ARAB, "")
+  .replace(/[\u0671\u0622\u0623\u0625]/g, "\u0627")
+  .replace(/\u0649/g, "\u064A")
+  .replace(/['\u2019\u2018\u02BF\u02BB`]/g, "")
+  .replace(/\s+/g, " ")
+  .trim()
+  .toLowerCase();
+
+// Bersihkan data (ruang kosong berlebihan) dan sediakan teks carian
+DATA.forEach(e => {
+  e.kalimah = e.kalimah.trim();
+  e.konteks = e.konteks.trim();
+  e.matan = e.matan || {};
+  e.bacaan.forEach(b => { b.teks = b.teks.trim(); b.cara = b.cara.trim(); });
+  e._cari = norm([e.kalimah, e.konteks, ...e.bacaan.flatMap(b => [b.teks, b.cara, ...b.imam])].join(" "));
+});
+
+/* ============ PAPARAN SENARAI ============ */
+
+function binaMatan(nama, teks) {
+  const ada = teks && teks.trim();
+  let isi;
+  if (!ada) {
+    isi = `<div class="kosong">Belum diisi. Masukkan bait daripada edisi tahqiq.</div>`;
+  } else {
+    const baris = teks.trim().split("\n").map(b => esc(b.trim())).join("<br>");
+    // Jika tiada huruf Arab (nota biasa), paparkan sebagai teks LTR
+    isi = /[\u0600-\u06FF]/.test(teks)
+      ? `<div class="arab" lang="ar">${baris}</div>`
+      : `<div class="nota">${baris}</div>`;
+  }
+  return `<div class="matan"><strong>${esc(nama)}</strong>${isi}</div>`;
+}
+
+function binaKad(e, pilihMatan) {
+  const bacaanHtml = e.bacaan.map(b => `
+    <div class="bacaan">
+      <div class="arab" lang="ar">${esc(b.teks)}</div>
+      <div>${b.imam.map(i => `<span class="imam">${esc(i)}</span>`).join("")}</div>
+      <div class="cara"><strong>Cara bacaan:</strong> ${esc(b.cara)}</div>
+    </div>`).join("");
+
+  let matanHtml = "";
+  if (pilihMatan !== "durrah")      matanHtml += binaMatan("Matan Asy-Syatibiyyah", e.matan.syatibiyyah);
+  if (pilihMatan !== "syatibiyyah") matanHtml += binaMatan("Matan Ad-Durrah", e.matan.durrah);
+
+  return `<div class="kad">
+    <div class="ayat">Al-Baqarah ${esc(e.ayat)}</div>
+    <div class="arab" lang="ar">${esc(e.konteks)}</div>
+    <div>Kalimah (Hafs): <span class="arab kalimah" lang="ar">${esc(e.kalimah)}</span></div>
+    ${bacaanHtml}
+    ${matanHtml}
+  </div>`;
+}
+
+function papar() {
+  const q = $("cari").value.trim();
+  const imam = $("tapisImam").value;
+  const matan = $("tapisMatan").value;
+  const qAyat = /^\d+\s*:\s*\d+$/.test(q) ? q.replace(/\s+/g, "") : null;
+  const qn = norm(q);
+
+  const hasil = DATA.filter(e => {
+    const padanCari = !q || (qAyat ? e.ayat === qAyat : (e.ayat === q || e._cari.includes(qn)));
+    const padanImam = !imam || e.bacaan.some(b => b.imam.includes(imam));
+    const padanMatan = matan === "semua" || !!(e.matan[matan] && e.matan[matan].trim());
+    return padanCari && padanImam && padanMatan;
+  });
+
+  $("bilangan").textContent = `${hasil.length} daripada ${DATA.length} kalimah`;
+  $("senarai").innerHTML = hasil.length
+    ? hasil.map(e => binaKad(e, matan)).join("")
+    : `<p>Tiada hasil.</p>`;
+}
+
+/* ============ KAD IMBAS ============ */
+let idx = 0, tunjuk = false;
+
+function paparKadImbas() {
+  const e = DATA[idx];
+  const jawapan = e.bacaan.map(b => `
+    <div class="bacaan">
+      <div class="arab" lang="ar">${esc(b.teks)}</div>
+      <div>${b.imam.map(i => `<span class="imam">${esc(i)}</span>`).join("")}</div>
+      <div class="cara">${esc(b.cara)}</div>
+    </div>`).join("");
+
+  $("kadImbas").innerHTML = `
+    <div class="ayat">Al-Baqarah ${esc(e.ayat)} (${idx + 1}/${DATA.length})</div>
+    <div class="arab" lang="ar">${esc(e.konteks)}</div>
+    <p>Soalan: Sebutkan khilaf bagi kalimah ini, siapa yang membaca setiap bacaan, dan caranya.</p>
+    <div class="arab kalimah" lang="ar">${esc(e.kalimah)}</div>
+    ${tunjuk ? jawapan : ""}`;
+}
+
+/* ============ AYAT AL-QURAN (kalimah khilaf berwarna) ============ */
+// Setiap ayat dipecah kepada kata. PETA menunjuk id khilaf -> [ayat, kata mula, kata akhir].
+const AYAT = [
+  { no: "2:1", kata: ["الٓمٓ"] },
+  { no: "2:2", kata: ["ذَٰلِكَ","ٱلْكِتَـٰبُ","لَا","رَيْبَ","ۛ","فِيهِ","ۛ","هُدًى","لِّلْمُتَّقِينَ"] },
+  { no: "2:3", kata: ["ٱلَّذِينَ","يُؤْمِنُونَ","بِٱلْغَيْبِ","وَيُقِيمُونَ","ٱلصَّلَوٰةَ","وَمِمَّا","رَزَقْنَـٰهُمْ","يُنفِقُونَ"] },
+  { no: "2:4", kata: ["وَٱلَّذِينَ","يُؤْمِنُونَ","بِمَآ","أُنزِلَ","إِلَيْكَ","وَمَآ","أُنزِلَ","مِن","قَبْلِكَ","وَبِٱلْـَٔاخِرَةِ","هُمْ","يُوقِنُونَ"] },
+  { no: "2:5", kata: ["أُو۟لَـٰٓئِكَ","عَلَىٰ","هُدًى","مِّن","رَّبِّهِمْ","ۖ","وَأُو۟لَـٰٓئِكَ","هُمُ","ٱلْمُفْلِحُونَ"] }
+];
+const PETA = {
+  1: ["2:1",0,0],  2: ["2:2",5,5],  3: ["2:2",5,7],
+  4: ["2:3",1,1],  5: ["2:3",4,4],  6: ["2:3",6,6],
+  7: ["2:4",1,1],  8: ["2:4",2,3],  9: ["2:4",5,6], 10: ["2:4",9,9], 11: ["2:4",10,10],
+  12: ["2:5",0,0], 13: ["2:5",4,4], 14: ["2:5",6,6]
+};
+const angkaArab = n => String(n).replace(/\d/g, d => "٠١٢٣٤٥٦٧٨٩"[d]);
+const entriDi = (ayat, i) => DATA.filter(e => {
+  const p = PETA[e.id];
+  return p && p[0] === ayat && i >= p[1] && i <= p[2];
+});
+let pilihan = null;
+
+function paparAyat() {
+  const entriPilih = pilihan ? entriDi(pilihan.ayat, pilihan.i) : [];
+  const diwarna = new Set();
+  entriPilih.forEach(e => {
+    const p = PETA[e.id];
+    for (let k = p[1]; k <= p[2]; k++) diwarna.add(p[0] + "#" + k);
+  });
+
+  $("ayatQuran").innerHTML = AYAT.map(a => {
+    const kata = a.kata.map((w, i) => {
+      if (!entriDi(a.no, i).length) return `<span class="kata">${esc(w)}</span>`;
+      const pilih = diwarna.has(a.no + "#" + i) ? " pilih" : "";
+      return `<button type="button" class="kata khilaf${pilih}" data-ayat="${a.no}" data-i="${i}">${esc(w)}</button>`;
+    }).join(" ");
+    return `<div class="ayatQ"><div class="arab teksAyat" lang="ar">${kata} <span class="penanda">\uFD3F${angkaArab(a.no.split(":")[1])}\uFD3E</span></div></div>`;
+  }).join("");
+
+  $("butiranAyat").innerHTML = entriPilih.length
+    ? entriPilih.map(e => binaKad(e, "semua")).join("")
+    : `<p class="petunjuk">Belum ada kalimah dipilih.</p>`;
+}
+
+$("ayatQuran").addEventListener("click", ev => {
+  const b = ev.target.closest(".khilaf");
+  if (!b) return;
+  const p = { ayat: b.dataset.ayat, i: Number(b.dataset.i) };
+  pilihan = (pilihan && pilihan.ayat === p.ayat && pilihan.i === p.i) ? null : p;
+  paparAyat();
+  if (pilihan) {
+    const baru = $("ayatQuran").querySelector && $("ayatQuran").querySelector(`[data-ayat="${p.ayat}"][data-i="${p.i}"]`);
+    if (baru) baru.focus();
+    if ($("butiranAyat").scrollIntoView) $("butiranAyat").scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }
+});
+
+/* ============ PENGENDALI ACARA ============ */
+const TAB = { ayat: ["tabAyat","paparAyat"], senarai: ["tabSenarai","paparSenarai"], kad: ["tabKad","paparKad"] };
+function tukarTab(nama) {
+  Object.entries(TAB).forEach(([k, [tab, papan]]) => {
+    const aktif = k === nama;
+    $(papan).classList.toggle("tersembunyi", !aktif);
+    $(tab).classList.toggle("aktif", aktif);
+    $(tab).setAttribute("aria-pressed", String(aktif));
+  });
+  if (nama === "kad") { tunjuk = false; paparKadImbas(); }
+}
+
+$("tabAyat").onclick    = () => tukarTab("ayat");
+$("tabSenarai").onclick = () => tukarTab("senarai");
+$("tabKad").onclick     = () => tukarTab("kad");
+$("btnTunjuk").onclick  = () => { tunjuk = true; paparKadImbas(); };
+$("btnSeterusnya").onclick = () => { idx = (idx + 1) % DATA.length; tunjuk = false; paparKadImbas(); };
+
+["cari","tapisImam","tapisMatan"].forEach(id => {
+  $(id).addEventListener("input", papar);
+  $(id).addEventListener("change", papar);
+});
+
+[...SEMUA_IMAM, ...PERAWI].forEach(i => {
+  const o = document.createElement("option");
+  o.value = i; o.textContent = i;
+  $("tapisImam").appendChild(o);
+});
+
+paparAyat();
+papar();
+</script>
+
+</body>
+</html>
